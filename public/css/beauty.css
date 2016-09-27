@@ -1,0 +1,38 @@
+.city_first{
+    width: auto;
+}
+.city_second{
+    width: auto;
+    display: none;
+}
+.city_third{
+    width: auto;
+    display: none;
+}
+.first{
+    margin-bottom: 5px;
+}
+.second{
+    margin-bottom: 5px;
+}
+.third{
+    margin-bottom: 5px;
+}
+.second>.select2.select2-container.select2-container--default{
+     display: none;
+ }
+.first>.select2.select2-container.select2-container--default{
+    display: none;
+}
+.third>.select2.select2-container.select2-container--default{
+    display: none;
+}
+.form-signin {
+    margin: 0 auto;
+    max-width: 330px;
+    padding: 15px;
+}
+
+.fa-btn {
+    margin-right: 6px;
+}
