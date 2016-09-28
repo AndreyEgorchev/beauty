@@ -118,11 +118,9 @@ class Specialist extends Model
     public function getCityForSpec($id)
     {
         $spec = Specialist::find($id);
-        $array_city =$spec->city;
+        $array_city = $spec->city;
         return $array_city;
     }
-
-
 
 
     /**
@@ -139,8 +137,12 @@ class Specialist extends Model
     public function setSpecialitysAttribute($specialitys)
     {
         $this->specialitys()->detach();
-        if (!$specialitys) {return;        }
-        if (!$this->exists) {$this->save();        }
+        if (!$specialitys) {
+            return;
+        }
+        if (!$this->exists) {
+            $this->save();
+        }
         $this->specialitys()->attach($specialitys);
     }
 
@@ -155,9 +157,9 @@ class Specialist extends Model
 
     public function getSpecialityForSpec($id)
     {
-        $specialitymodel= new Speciality();
+        $specialitymodel = new Speciality();
         $spec = Specialist::find($id);
-        foreach ($spec->specialitys as $key){
+        foreach ($spec->specialitys as $key) {
             $array_spec[] = $specialitymodel->getNameSpeciality($key);
         }
         return $array_spec;
@@ -186,18 +188,48 @@ class Specialist extends Model
      */
     public function filter($filter1_id, $filter3_id, $filter2_id)
     {
-        $specialists = Specialist::latest('last_name')
-            ->when($filter1_id, function ($query) use ($filter1_id) {
-                return $query->where('last_name', $filter1_id);
-            })
-            ->when($filter3_id, function ($query) use ($filter3_id) {
-                return $query->where('specialty_name', $filter3_id);
-            })
-            ->when($filter2_id, function ($query) use ($filter2_id) {
-                return $query->whereIn('id', $filter2_id);
-            })
-            ->get();
-        return $specialists;
+        if ($filter3_id !== 0) {
+            $speciality = DB::table('spec_speciality')->where('speciality_id', '=', $filter3_id)->get();
+            foreach ($speciality as $key) {
+                $array_speciality_id[] = $key->specialist_id;
+            }
+        }
+        if ($filter2_id !== 0) {
+            $city = DB::table('spec_city')->where('city_id', '=', $filter2_id)->get();
+            foreach ($city as $key) {
+                $array_city_id[] = $key->specialist_id;
+            }
+        }
+        if (!empty($array_speciality_id) && !empty($array_city_id)) {
+            $temp = array();
+            foreach ($array_speciality_id as $v) {
+                if (in_array($v, $array_city_id) && !in_array($v, $temp)) {
+                    array_push($temp, $v);
+                }
+            }
+            foreach ($temp as $key) {
+                $result[] = Specialist::query('last_name')->where('id', '=', $key)->get();
+            }
+        } elseif (!empty($array_speciality_id)) {
+            foreach ($array_speciality_id as $key) {
+                $result[] = Specialist::query('last_name')->where('id', '=', $key)->get();
+            }
+        } else {
+            if (!empty($array_city_id)) {
+                foreach ($array_city_id as $key) {
+                    $result[] = Specialist::query('last_name')->where('id', '=', $key)->get();
+                }
+            }
+            return null;
+        }
+
+        foreach ($result as $item) {
+            foreach ($item as $key) {
+                $array_spec[] = $key;
+            }
+        }
+
+        return $array_spec;
     }
 
     /**

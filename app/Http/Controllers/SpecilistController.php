@@ -194,7 +194,7 @@ class SpecilistController extends Controller
         $specialist->city()->sync(array($request->city_first, $request->city_second, $request->city_third));
         $specialist->specialitys()->sync(array($request->specialty_name_1, $request->specialty_name_2, $request->specialty_name_3));
         $specialist->fill($input)->save();
-        return Redirect::to('profile/'.$id);
+        return Redirect::to('profile/' . $id);
 //        }
     }
 
@@ -281,28 +281,30 @@ class SpecilistController extends Controller
 
     public function getFilter(Request $request, Specialist $specmodel)
     {
-        $city = $specmodel->getAllcity(intval($_POST['filter2_id']));
+//        $city = $specmodel->getAllcity(intval($_POST['filter2_id']));
 
-        if (empty($_POST['filter1_id']) && intval($_POST['filter3_id']) == 0 && $city == 0) {
+        if (empty($_POST['filter1_id']) && intval($_POST['filter3_id']) == 0 && intval($_POST['filter2_id']) == 0) {
             echo 'ok';
             $specialists = Specialist::all();
         } else {
-            $specialists = $specmodel->filter($_POST['filter1_id'], intval($_POST['filter3_id']), $city);
+            $specialists = $specmodel->filter($_POST['filter1_id'], intval($_POST['filter3_id']), intval($_POST['filter2_id']));
+            if ($specialists===null){
+                return new Response();
+            }
         }
-
         foreach ($specialists as $specialist) {
-            echo "<dt class='list-determination_definition'>" . $specialist->first_name . "</dt>";
-            echo "<dt class='list-determination_definition'>" . $specialist->last_name . "</dt>";
-            echo "<dt class='list-determination_definition'>" . $specialist->phone_number . "</dt>";
-            echo "<dt class='list-determination_definition'>" . $specialist->email . "</dt>";
-            echo "<dt class='list-determination_definition'>" . $specialist->FullCity . "</dt>";
-            echo " <p>";
-            echo "<a href=" . route('specialists.show', $specialist->id) . " class='btn btn-info'>View Task</a>";
-            echo "<a href=" . route('specialists.edit', $specialist->id) . " class='btn btn-primary'>Edit  Task</a>";
-            echo "</p>";
-        }
+                echo "<dt class='list-determination_definition'>" . $specialist->first_name . "</dt>";
+                echo "<dt class='list-determination_definition'>" . $specialist->last_name . "</dt>";
+                echo "<dt class='list-determination_definition'>" . $specialist->phone_number . "</dt>";
+                echo "<dt class='list-determination_definition'>" . $specialist->email . "</dt>";
+                echo "<dt class='list-determination_definition'>" . $specialist->FullCity . "</dt>";
+                echo " <p>";
+                echo "<a href=" . route('specialists.show', $specialist->id) . " class='btn btn-info'>View Task</a>";
+                echo "</p>";
+
+
+            }
 
         return new Response();
     }
-
 }
